@@ -116,23 +116,38 @@ class TestFileStorage(unittest.TestCase):
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_get(self):
-        """ Test that it gets the obj by its id"""
-
+        """
+        test get() method with :
+        -adding state to the storage
+        -not existing state
+        """
         storage = FileStorage()
-        obj_1st = list(storage.all(State).values())[0]
-        obj_id = obj_1st.id
-        obj_cls = obj_1st.__class__.__name__
-        obj_get = storage.get(obj_cls, str(obj_id))
+        n_state = State()
+        n_state.name = "State to test"
+        storage.new(n_state)
+        storage.save()
 
-        self.assertEqual(obj_get, obj_1st)
+        state_to_retrieve = storage.get(State, n_state.id)
+        not_exising_state = storage.get(State, "not a State")
+
+        self.assertIsNotNone(state_to_retrieve)
+        self.assertIsNone(not_exising_state)
+        self.assertEqual(state_to_retrieve.name, "State to test")
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_count(self):
-        """ Test that check if the count method works"""
+        """
+        testing method count with:
+        -adding new states to the storage
+        -adding objects if different classes to the storage
+        """
         storage = FileStorage()
-
-        count_all = len(storage.all())
-        count_states = len(storage.all(State))
-
-        self.assertEqual(count_all, storage.count())
-        self.assertEqual(count_states, storage.count(State))
+        for i in range(4):
+            n_state = State()
+            n_state.name = "State {}".format(i)
+            storage.new(n_state)
+            n_city = City()
+            storage.new(n_city)
+        storage.save()
+        self.assertEqual(storage.count(State), 5)
+        self.assertEqual(storage.count(), 15)

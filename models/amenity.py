@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" holds class Amenity"""
+""" class to handle the ameneties"""
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
@@ -9,13 +9,13 @@ from sqlalchemy.orm import relationship
 
 
 class Amenity(BaseModel, Base):
-    """Representation of Amenity """
+    """Amenity models class """
     if models.storage_t == 'db':
-        __tablename__ = 'amenities'
         name = Column(String(128), nullable=False)
+        __tablename__ = 'amenities'
     else:
         name = ""
 
     def __init__(self, *args, **kwargs):
-        """initializes Amenity"""
+        """initializes the class"""
         super().__init__(*args, **kwargs)

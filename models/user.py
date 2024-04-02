@@ -1,10 +1,12 @@
 #!/usr/bin/python3
-""" holds class User"""
+""" class to handle the users"""
 import models
 from models.base_model import BaseModel, Base
-from os import getenv
-import sqlalchemy
+import hashlib
 from sqlalchemy import Column, String
+import hashlib
+from models.base_model import BaseModel, Base
+import models
 from sqlalchemy.orm import relationship
 
 
@@ -16,8 +18,14 @@ class User(BaseModel, Base):
         password = Column(String(128), nullable=False)
         first_name = Column(String(128), nullable=True)
         last_name = Column(String(128), nullable=True)
-        places = relationship("Place", backref="user")
-        reviews = relationship("Review", backref="user")
+        places = relationship(
+                "Place",
+                backref="user",
+                cascade='all, delete, delete-orphan')
+        reviews = relationship(
+                "Review",
+                backref="user",
+                cascade='all, delete, delete-orphan')
     else:
         email = ""
         password = ""
@@ -26,4 +34,6 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
+        kwargs["password"] = hashlib.md5(
+            kwargs["password"].encode()).hexdigest()
         super().__init__(*args, **kwargs)
